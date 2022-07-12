@@ -33,7 +33,8 @@ router.post('/', (req, res) => {
         return
     }
     Posts.insert(req.body)
-        .then(post => res.status(201).json({...req.body, id: post.id}))
+        .then(id => Posts.findById(id.id))
+        .then(post => res.status(201).json(post))
         .catch(error => res.status(500).json({message: "There was an error while saving the post to the database"}))
 })
 
@@ -50,8 +51,9 @@ router.put('/:id', (req, res) => {
                 res.status(404).json({message: "The post with the specified ID does not exist"})
                 return
             }
-            res.json({ id, ...req.body})
+            return Posts.findById(id)
         })
+        .then(post => res.json(post))
         .catch(error => res.status(500).json({message: "The post information could not be modified"}))
 })
 
