@@ -25,3 +25,14 @@ router.get('/:id', (req, res) => {
         })
         .catch(error => res.status(500).json({message: "The post information could not be retrieved" }))
 })
+
+router.post('/', (req, res) => {
+    const { title, contents } = req.body;
+    if(title == null || contents == null){
+        res.status(400).json({message: "Please provide title and contents for the post"})
+        return
+    }
+    Posts.insert(req.body)
+        .then(post => res.status(201).json({...req.body, id: post.id}))
+        .catch(error => res.status(500).json({message: "There was an error while saving the post to the database"}))
+})
