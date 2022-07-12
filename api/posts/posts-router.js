@@ -36,3 +36,35 @@ router.post('/', (req, res) => {
         .then(post => res.status(201).json({...req.body, id: post.id}))
         .catch(error => res.status(500).json({message: "There was an error while saving the post to the database"}))
 })
+
+router.put('/:id', (req, res) => {
+    const { id } = req.params
+    const { title, contents } = req.body;
+    if(title == null || contents == null){
+        res.status(400).json({message: "Please provide title and contents for the post"})
+        return
+    }
+    Posts.update(id, req.body)
+        .then(updated => {
+            if(updated !== 1){
+                res.status(404).json({message: "The post with the specified ID does not exist"})
+                return
+            }
+            res.json({ id, ...req.body})
+        })
+        .catch(error => res.status(500).json({message: "The post information could not be modified"}))
+})
+
+router.delete('/:id', async (req, res) => {
+    const { id } = req.params;
+    const post = await Posts.findById(id)
+    Posts.remove(id)
+        .then(removed => {
+            if(removed === 1){
+                res.json(post)
+                return
+            }
+            res.status(404).json({message: "The post with the specified ID does not exist"})
+        })
+        .catch(error => res.status(500).json({message: "The post could not be removed"}))
+})
